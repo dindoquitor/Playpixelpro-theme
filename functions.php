@@ -144,6 +144,100 @@ function playpixelpro_widgets_init() {
 add_action( 'widgets_init', 'playpixelpro_widgets_init' );
 
 /**
+ * Custom Terminal Recent Posts Widget (matching Related Articles card design).
+ */
+class PlayPixelPro_Widget_Recent_Posts extends WP_Widget_Recent_Posts {
+
+	public function widget( $args, $instance ) {
+		if ( ! isset( $args['widget_id'] ) ) {
+			$args['widget_id'] = $this->id;
+		}
+
+		$title = ( ! empty( $instance['title'] ) ) ? $instance['title'] : __( 'Recent Posts', 'playpixelpro' );
+		$title = apply_filters( 'widget_title', $title, $instance, $this->id_base );
+
+		$number = ( ! empty( $instance['number'] ) ) ? absint( $instance['number'] ) : 5;
+		if ( ! $number ) {
+			$number = 5;
+		}
+		$show_date = isset( $instance['show_date'] ) ? $instance['show_date'] : false;
+
+		$r = new WP_Query(
+			apply_filters(
+				'widget_posts_args',
+				array(
+					'posts_per_page'      => $number,
+					'no_found_rows'       => true,
+					'post_status'         => 'publish',
+					'ignore_sticky_posts' => true,
+				),
+				$instance
+			)
+		);
+
+		if ( ! $r->have_posts() ) {
+			return;
+		}
+
+		echo $args['before_widget'];
+		if ( $title ) {
+			echo $args['before_title'] . esc_html( $title ) . $args['after_title'];
+		}
+		?>
+		<div class="recent-posts-card-list" style="display: flex; flex-direction: column; gap: 16px; margin-top: 12px;">
+			<?php
+			while ( $r->have_posts() ) :
+				$r->the_post();
+				$excerpt_raw = get_the_excerpt();
+				if ( empty( $excerpt_raw ) ) {
+					$excerpt_raw = get_the_title();
+				}
+				$summary_text = wp_trim_words( $excerpt_raw, 12, '...' );
+				?>
+				<article class="related-post-card">
+					<?php if ( has_post_thumbnail() ) : ?>
+						<div class="related-thumb-wrap">
+							<a href="<?php the_permalink(); ?>">
+								<?php the_post_thumbnail( 'medium', array( 'class' => 'related-post-img', 'alt' => get_the_title() ) ); ?>
+							</a>
+						</div>
+					<?php endif; ?>
+
+					<div class="related-post-content">
+						<h4 class="related-post-title">
+							<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+						</h4>
+
+						<?php if ( $show_date ) : ?>
+							<div class="related-post-date" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 6px;">
+								[<?php echo esc_html( get_the_date( 'Y-m-d' ) ); ?>]
+							</div>
+						<?php endif; ?>
+
+						<p class="related-post-summary">
+							<?php echo esc_html( $summary_text ); ?>
+						</p>
+
+						<div class="related-post-action">
+							<a href="<?php the_permalink(); ?>" class="button related-post-btn">READ &gt;</a>
+						</div>
+					</div>
+				</article>
+			<?php endwhile; ?>
+		</div>
+		<?php
+		echo $args['after_widget'];
+		wp_reset_postdata();
+	}
+}
+
+function playpixelpro_register_custom_recent_posts() {
+	unregister_widget( 'WP_Widget_Recent_Posts' );
+	register_widget( 'PlayPixelPro_Widget_Recent_Posts' );
+}
+add_action( 'widgets_init', 'playpixelpro_register_custom_recent_posts', 15 );
+
+/**
  * Register Navigation Menus.
  */
 function playpixelpro_fallback_menu() {
