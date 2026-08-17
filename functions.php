@@ -288,3 +288,45 @@ function playpixelpro_is_option_enabled( $mod_name, $default = true ) {
 	}
 	return true;
 }
+
+/**
+ * Add Open Graph & Twitter Card Meta Tags to <head> for Social Sharing.
+ */
+function playpixelpro_add_social_meta_tags() {
+	if ( is_singular() ) {
+		global $post;
+		$title     = esc_attr( get_the_title( $post->ID ) );
+		$url       = esc_url( get_permalink( $post->ID ) );
+		$site_name = esc_attr( get_bloginfo( 'name' ) );
+		$excerpt   = esc_attr( wp_strip_all_tags( get_the_excerpt( $post->ID ) ) );
+		if ( empty( $excerpt ) ) {
+			$excerpt = $title;
+		}
+
+		$image_url = '';
+		if ( has_post_thumbnail( $post->ID ) ) {
+			$thumb_id  = get_post_thumbnail_id( $post->ID );
+			$thumb_src = wp_get_attachment_image_src( $thumb_id, 'large' );
+			if ( ! empty( $thumb_src[0] ) ) {
+				$image_url = esc_url( $thumb_src[0] );
+			}
+		}
+
+		echo "\n<!-- PlayPixelPro Open Graph & Twitter Card Meta Tags -->\n";
+		echo '<meta property="og:type" content="article" />' . "\n";
+		echo '<meta property="og:title" content="' . $title . '" />' . "\n";
+		echo '<meta property="og:description" content="' . $excerpt . '" />' . "\n";
+		echo '<meta property="og:url" content="' . $url . '" />' . "\n";
+		echo '<meta property="og:site_name" content="' . $site_name . '" />' . "\n";
+		if ( ! empty( $image_url ) ) {
+			echo '<meta property="og:image" content="' . $image_url . '" />' . "\n";
+		}
+		echo '<meta name="twitter:card" content="summary_large_image" />' . "\n";
+		echo '<meta name="twitter:title" content="' . $title . '" />' . "\n";
+		echo '<meta name="twitter:description" content="' . $excerpt . '" />' . "\n";
+		if ( ! empty( $image_url ) ) {
+			echo '<meta name="twitter:image" content="' . $image_url . '" />' . "\n";
+		}
+	}
+}
+add_action( 'wp_head', 'playpixelpro_add_social_meta_tags', 5 );

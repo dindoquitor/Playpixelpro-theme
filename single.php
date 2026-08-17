@@ -117,42 +117,42 @@ while ( have_posts() ) :
 			</section>
 
 			<?php if ( $show_share_x || $show_share_facebook || $show_share_linkedin || $show_share_reddit || $show_share_email ) : ?>
-				<!-- Social Share Buttons -->
+				<!-- Social Share Buttons (matching Ultimate Social Media Icons popup window pattern) -->
 				<div class="post-share-wrap" style="margin-top: 36px; padding-top: 24px; border-top: 2px dashed var(--line);">
 					<div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--gold); font-weight: 700; text-transform: uppercase; margin-bottom: 12px;">
 						&gt; share_article --target=[social_network]
 					</div>
 					<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
 						<?php if ( $show_share_x ) : ?>
-							<a class="button" href="https://twitter.com/intent/tweet?text=<?php echo $title_encoded; ?>&amp;url=<?php echo $permalink_encoded; ?>" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px;">
+							<a class="button ppp-social-popup" href="https://twitter.com/intent/tweet?text=<?php echo $title_encoded; ?>&amp;url=<?php echo $permalink_encoded; ?>" onclick="window.open(this.href, 'shareWindow', 'width=600,height=500,top='+(screen.height/2-250)+',left='+(screen.width/2-300)); return false;" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px;">
 								<span class="material-symbols-outlined" style="font-size: 1rem;">share</span>
 								<span>X / TWITTER</span>
 							</a>
 						<?php endif; ?>
 
 						<?php if ( $show_share_facebook ) : ?>
-							<a class="button" href="https://www.facebook.com/sharer/sharer.php?u=<?php echo $permalink_encoded; ?>" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px;">
+							<a class="button ppp-social-popup" href="https://www.facebook.com/sharer/sharer.php?u=<?php echo $permalink_encoded; ?>" onclick="window.open(this.href, 'shareWindow', 'width=600,height=500,top='+(screen.height/2-250)+',left='+(screen.width/2-300)); return false;" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px;">
 								<span class="material-symbols-outlined" style="font-size: 1rem;">public</span>
 								<span>FACEBOOK</span>
 							</a>
 						<?php endif; ?>
 
 						<?php if ( $show_share_linkedin ) : ?>
-							<a class="button" href="https://www.linkedin.com/sharing/share-offsite/?url=<?php echo $permalink_encoded; ?>" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px;">
+							<a class="button ppp-social-popup" href="https://www.linkedin.com/sharing/share-offsite/?url=<?php echo $permalink_encoded; ?>" onclick="window.open(this.href, 'shareWindow', 'width=600,height=500,top='+(screen.height/2-250)+',left='+(screen.width/2-300)); return false;" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px;">
 								<span class="material-symbols-outlined" style="font-size: 1rem;">work</span>
 								<span>LINKEDIN</span>
 							</a>
 						<?php endif; ?>
 
 						<?php if ( $show_share_reddit ) : ?>
-							<a class="button" href="https://reddit.com/submit?url=<?php echo $permalink_encoded; ?>&amp;title=<?php echo $title_encoded; ?>" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px;">
+							<a class="button ppp-social-popup" href="https://reddit.com/submit?url=<?php echo $permalink_encoded; ?>&amp;title=<?php echo $title_encoded; ?>" onclick="window.open(this.href, 'shareWindow', 'width=600,height=500,top='+(screen.height/2-250)+',left='+(screen.width/2-300)); return false;" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px;">
 								<span class="material-symbols-outlined" style="font-size: 1rem;">forum</span>
 								<span>REDDIT</span>
 							</a>
 						<?php endif; ?>
 
 						<?php if ( $show_share_email ) : ?>
-							<a class="button" href="mailto:?subject=<?php echo $title_encoded; ?>&amp;body=<?php echo $permalink_encoded; ?>" style="display: inline-flex; align-items: center; gap: 6px;">
+							<a class="button" href="mailto:?subject=<?php echo $title_encoded; ?>&amp;body=<?php echo $title_encoded; ?>%0A%0A<?php echo $permalink_encoded; ?>" style="display: inline-flex; align-items: center; gap: 6px;">
 								<span class="material-symbols-outlined" style="font-size: 1rem;">mail</span>
 								<span>EMAIL</span>
 							</a>
