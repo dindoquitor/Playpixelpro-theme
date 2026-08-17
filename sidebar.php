@@ -79,18 +79,30 @@ $mem_percent  = min( 100, round( ( memory_get_usage() / ( 128 * 1024 * 1024 ) ) 
 		</div>
 	</div>
 
-	<!-- 4. Vintage Mainframe Image Box -->
-	<div class="terminal-window" style="margin-bottom: 0;">
-		<div class="window-bar">
-			<div class="window-dots">
-				<span class="window-dot dot-red"></span>
-				<span class="window-dot dot-yellow"></span>
-				<span class="window-dot dot-green"></span>
+	<?php
+	$show_sidebar_img  = playpixelpro_is_option_enabled( 'playpixelpro_show_sidebar_image', true );
+	$sidebar_img_title = get_theme_mod( 'playpixelpro_sidebar_image_title', 'MAINFRAME // PDP-11' );
+	$sidebar_img_url   = get_theme_mod( 'playpixelpro_sidebar_image', '' );
+
+	if ( empty( $sidebar_img_url ) ) {
+		$sidebar_img_url = get_template_directory_uri() . '/assets/images/vintage-mainframe.jpg';
+	}
+	?>
+
+	<?php if ( $show_sidebar_img ) : ?>
+		<!-- 4. Vintage Mainframe Image Box -->
+		<div class="terminal-window" style="margin-bottom: 0;">
+			<div class="window-bar">
+				<div class="window-dots">
+					<span class="window-dot dot-red"></span>
+					<span class="window-dot dot-yellow"></span>
+					<span class="window-dot dot-green"></span>
+				</div>
+				<span class="window-title"><?php echo esc_html( $sidebar_img_title ); ?></span>
 			</div>
-			<span class="window-title">MAINFRAME // PDP-11</span>
+			<div style="position: relative; overflow: hidden;">
+				<img src="<?php echo esc_url( $sidebar_img_url ); ?>" alt="<?php echo esc_attr( $sidebar_img_title ); ?>" style="width: 100%; display: block; border: 0; filter: grayscale(40%); transition: filter 0.3s ease;">
+			</div>
 		</div>
-		<div style="position: relative; overflow: hidden;">
-			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/vintage-mainframe.jpg' ); ?>" alt="Vintage Mainframe Computer" style="width: 100%; display: block; border: 0; filter: grayscale(40%); transition: filter 0.3s ease;">
-		</div>
-	</div>
+	<?php endif; ?>
 </aside>

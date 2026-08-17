@@ -942,11 +942,95 @@ function playpixelpro_customize_register( $wp_customize ) {
 	$wp_customize->add_setting( 'playpixelpro_about_cta_btn2_url', array( 'default' => '#', 'sanitize_callback' => 'esc_url_raw' ) );
 	$wp_customize->add_control( 'playpixelpro_about_cta_btn2_url', array( 'label' => __( 'Button 2 URL', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'url' ) );
 
-	$wp_customize->add_setting( 'playpixelpro_about_cta_image', array( 'default' => 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?q=80&w=1200&auto=format&fit=crop', 'sanitize_callback' => 'esc_url_raw' ) );
-	$wp_customize->add_control( 'playpixelpro_about_cta_image', array( 'label' => __( 'CTA Image URL', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'url' ) );
+	$wp_customize->add_setting(
+		'playpixelpro_about_cta_image',
+		array(
+			'default'           => 'https://lh3.googleusercontent.com/aida-public/AB6AXuBVvQM86xaZd9brr_jSpkhNAXV0Q14Xn3gBomWV-dRCR4AjWmQQJtVxn6uqG-X9Ush_e-BvH6SLWelp3bjydlG2zaa5gVwqQVVv95Nvd2ajTontS5UAaI1WDaf-HbljuLaRkkZCdrCs36izZ-a2FYIjRGST51h33fQy8Lf9StsG9MxLxeKybt5XivIVDe-PO1FLzFtUNRxisI65YZfMtdg-s1qyfa36Mro5IofkmRwa-X7GFTgKLWpXYOvIb2CbNOHdrK0srWkrmRxM',
+			'sanitize_callback' => 'esc_url_raw',
+		)
+	);
+	$wp_customize->add_control(
+		new WP_Customize_Image_Control(
+			$wp_customize,
+			'playpixelpro_about_cta_image',
+			array(
+				'label'       => __( 'CTA Terminal Image', 'playpixelpro' ),
+				'description' => __( 'Upload or select an image for the lower-right terminal banner. Recommended resolution: 1200 x 512 px (Aspect ratio ~2:1 or 16:9, minimum width 600px).', 'playpixelpro' ),
+				'section'     => 'playpixelpro_about_section',
+				'settings'    => 'playpixelpro_about_cta_image',
+			)
+		)
+	);
 
 	$wp_customize->add_setting( 'playpixelpro_about_cta_lens_id', array( 'default' => 'LENS_ID: 0x4F2A', 'sanitize_callback' => 'sanitize_text_field' ) );
 	$wp_customize->add_control( 'playpixelpro_about_cta_lens_id', array( 'label' => __( 'CTA Lens ID Badge', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	// ==========================================================================
+	// Section: Sidebar Options (Blog Posts List Page)
+	// ==========================================================================
+	$wp_customize->add_section(
+		'playpixelpro_sidebar_section',
+		array(
+			'title'    => __( 'Sidebar Options', 'playpixelpro' ),
+			'panel'    => 'playpixelpro_panel',
+			'priority' => 50,
+		)
+	);
+
+	// Toggle Sidebar Image Widget
+	$wp_customize->add_setting(
+		'playpixelpro_show_sidebar_image',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'playpixelpro_sanitize_checkbox',
+		)
+	);
+	$wp_customize->add_control(
+		'playpixelpro_show_sidebar_image',
+		array(
+			'label'    => __( 'Show Sidebar Terminal Image Widget', 'playpixelpro' ),
+			'section'  => 'playpixelpro_sidebar_section',
+			'type'     => 'checkbox',
+		)
+	);
+
+	// Sidebar Image Title Bar Text
+	$wp_customize->add_setting(
+		'playpixelpro_sidebar_image_title',
+		array(
+			'default'           => 'MAINFRAME // PDP-11',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+	$wp_customize->add_control(
+		'playpixelpro_sidebar_image_title',
+		array(
+			'label'    => __( 'Sidebar Image Window Title', 'playpixelpro' ),
+			'section'  => 'playpixelpro_sidebar_section',
+			'type'     => 'text',
+		)
+	);
+
+	// Sidebar Image Control with Upload & Guidelines
+	$wp_customize->add_setting(
+		'playpixelpro_sidebar_image',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'esc_url_raw',
+		)
+	);
+	$wp_customize->add_control(
+		new WP_Customize_Image_Control(
+			$wp_customize,
+			'playpixelpro_sidebar_image',
+			array(
+				'label'       => __( 'Sidebar Terminal Image', 'playpixelpro' ),
+				'description' => __( 'Upload or select an image for the bottom-right sidebar terminal banner. Recommended resolution: 600 x 400 px (Aspect ratio ~3:2 or 4:3, minimum width 300px).', 'playpixelpro' ),
+				'section'     => 'playpixelpro_sidebar_section',
+				'settings'    => 'playpixelpro_sidebar_image',
+			)
+		)
+	);
 }
 add_action( 'customize_register', 'playpixelpro_customize_register' );
 

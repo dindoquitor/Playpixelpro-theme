@@ -241,7 +241,7 @@ $cta_lens   = get_theme_mod( 'playpixelpro_about_cta_lens_id', 'LENS_ID: 0x4F2A'
 						<a href="<?php echo esc_url( $cta_url1 ); ?>" class="about-btn-primary"><?php echo esc_html( $cta_btn1 ); ?></a>
 					<?php endif; ?>
 					<?php if ( ! empty( $cta_btn2 ) ) : ?>
-						<a href="<?php echo esc_url( $cta_url2 ); ?>" class="about-btn-secondary"><?php echo esc_html( $cta_btn2 ); ?></a>
+						<a href="<?php echo esc_url( $cta_url2 ); ?>" class="about-btn-secondary" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $cta_btn2 ); ?></a>
 					<?php endif; ?>
 				</div>
 			</div>

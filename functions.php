@@ -73,20 +73,22 @@ function playpixelpro_assets() {
 		null
 	);
 
-	// Enqueue Main Theme Stylesheet
+	// Enqueue Main Theme Stylesheet (with automatic cache busting based on file modification time)
+	$style_ver = file_exists( get_template_directory() . '/style.css' ) ? filemtime( get_template_directory() . '/style.css' ) : '1.4.1';
 	wp_enqueue_style(
 		'playpixelpro',
 		get_stylesheet_uri(),
 		array(),
-		'1.2.0'
+		$style_ver
 	);
 
 	// Enqueue Site JS
+	$js_ver = file_exists( get_template_directory() . '/assets/js/site.js' ) ? filemtime( get_template_directory() . '/assets/js/site.js' ) : '1.4.1';
 	wp_enqueue_script(
 		'playpixelpro',
 		get_template_directory_uri() . '/assets/js/site.js',
 		array(),
-		'1.2.0',
+		$js_ver,
 		true
 	);
 
