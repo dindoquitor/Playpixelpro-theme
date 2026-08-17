@@ -1,6 +1,6 @@
 <?php
 /**
- * Content template for Terminal About Me page.
+ * Content template for Terminal About Me page (matching new_design/developer_portfolio_about_me/code.html).
  *
  * @package PlayPixelPro
  */
@@ -17,10 +17,10 @@ $command     = get_theme_mod( 'playpixelpro_about_hero_command', 'cat bio.md' );
 $hero_title  = get_theme_mod( 'playpixelpro_about_hero_title', '# ARCHITECTING DIGITAL INFRASTRUCTURE' );
 $hero_bio    = get_theme_mod( 'playpixelpro_about_hero_bio', 'Senior developer specializing in high-performance cross-platform systems. Bridging the gap between low-level Android performance and modern reactive web architectures.' );
 
-$col1_title = get_theme_mod( 'playpixelpro_about_hero_col1_title', 'ANDROID ECOSYSTEM' );
+$col1_title = get_theme_mod( 'playpixelpro_about_hero_col1_title', 'Android Ecosystem' );
 $col1_items = get_theme_mod( 'playpixelpro_about_hero_col1_items', "Kotlin / Coroutines / Flow\nJetpack Compose UI Engine\nNative C++ (JNI) Integrations\nMaterial 3 Implementation" );
 
-$col2_title = get_theme_mod( 'playpixelpro_about_hero_col2_title', 'WEB INFRASTRUCTURE' );
+$col2_title = get_theme_mod( 'playpixelpro_about_hero_col2_title', 'Web Infrastructure' );
 $col2_items = get_theme_mod( 'playpixelpro_about_hero_col2_items', "React & Next.js Frameworks\nTypeScript / Strict Typing\nWebGL & Shader Programming\nTailwind & Headless UI" );
 
 // 2. System Modules
@@ -87,113 +87,105 @@ $cta_btn1   = get_theme_mod( 'playpixelpro_about_cta_btn1_text', 'INIT_CONTACT' 
 $cta_url1   = get_theme_mod( 'playpixelpro_about_cta_btn1_url', '#' );
 $cta_btn2   = get_theme_mod( 'playpixelpro_about_cta_btn2_text', 'VIEW_REPOSITORY' );
 $cta_url2   = get_theme_mod( 'playpixelpro_about_cta_btn2_url', '#' );
-$cta_image  = get_theme_mod( 'playpixelpro_about_cta_image', 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?q=80&w=1200&auto=format&fit=crop' );
+$cta_image  = get_theme_mod( 'playpixelpro_about_cta_image', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBVvQM86xaZd9brr_jSpkhNAXV0Q14Xn3gBomWV-dRCR4AjWmQQJtVxn6uqG-X9Ush_e-BvH6SLWelp3bjydlG2zaa5gVwqQVVv95Nvd2ajTontS5UAaI1WDaf-HbljuLaRkkZCdrCs36izZ-a2FYIjRGST51h33fQy8Lf9StsG9MxLxeKybt5XivIVDe-PO1FLzFtUNRxisI65YZfMtdg-s1qyfa36Mro5IofkmRwa-X7GFTgKLWpXYOvIb2CbNOHdrK0srWkrmRxM' );
 $cta_lens   = get_theme_mod( 'playpixelpro_about_cta_lens_id', 'LENS_ID: 0x4F2A' );
 ?>
 
-<div class="about-me-container site-container" style="padding-top: 24px; padding-bottom: 48px;">
+<div class="about-page-wrapper">
 
 	<?php if ( $show_hero ) : ?>
-		<!-- Section 1: Terminal Hero -->
-		<section class="terminal-window" style="margin-bottom: 40px;">
-			<div class="window-bar">
-				<div class="window-dots">
-					<span class="window-dot dot-red"></span>
-					<span class="window-dot dot-yellow"></span>
-					<span class="window-dot dot-green"></span>
-				</div>
-				<span class="window-title"><?php echo esc_html( $session ); ?></span>
-			</div>
-			<div class="terminal-body" style="padding: 24px;">
-				<div style="display: flex; gap: 12px; margin-bottom: 16px; font-size: 0.9rem;">
-					<span style="color: var(--gold); font-weight: bold;"><?php echo esc_html( $prompt ); ?></span>
-					<span><?php echo esc_html( $command ); ?></span>
-				</div>
-
-				<div style="border-left: 2px solid var(--accent-dim); padding-left: 16px; margin: 16px 0;">
-					<h1 style="color: var(--gold); font-size: 1.4rem; margin: 0 0 16px; font-weight: 700; text-transform: uppercase;">
-						<?php echo esc_html( $hero_title ); ?>
-					</h1>
-
-					<p style="max-width: 750px; line-height: 1.6; color: var(--text); margin-bottom: 24px; font-size: 0.95rem;">
-						<?php echo esc_html( $hero_bio ); ?>
-					</p>
-
-					<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
-						<?php if ( ! empty( $col1_title ) ) : ?>
-							<div>
-								<h2 style="color: var(--gold); border-bottom: 1px solid var(--line); padding-bottom: 6px; margin: 0 0 12px; font-size: 0.95rem; text-transform: uppercase;">
-									<?php echo esc_html( $col1_title ); ?>
-								</h2>
-								<ul style="list-style: none; margin: 0; padding: 0;">
-									<?php
-									$lines1 = array_filter( array_map( 'trim', explode( "\n", $col1_items ) ) );
-									foreach ( $lines1 as $item ) :
-										?>
-										<li style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 0.88rem;">
-											<span style="color: var(--gold); font-weight: bold;">&gt;</span>
-											<span><?php echo esc_html( $item ); ?></span>
-										</li>
-									<?php endforeach; ?>
-								</ul>
-							</div>
-						<?php endif; ?>
-
-						<?php if ( ! empty( $col2_title ) ) : ?>
-							<div>
-								<h2 style="color: var(--gold); border-bottom: 1px solid var(--line); padding-bottom: 6px; margin: 0 0 12px; font-size: 0.95rem; text-transform: uppercase;">
-									<?php echo esc_html( $col2_title ); ?>
-								</h2>
-								<ul style="list-style: none; margin: 0; padding: 0;">
-									<?php
-									$lines2 = array_filter( array_map( 'trim', explode( "\n", $col2_items ) ) );
-									foreach ( $lines2 as $item ) :
-										?>
-										<li style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 0.88rem;">
-											<span style="color: var(--gold); font-weight: bold;">&gt;</span>
-											<span><?php echo esc_html( $item ); ?></span>
-										</li>
-									<?php endforeach; ?>
-								</ul>
-							</div>
-						<?php endif; ?>
+		<!-- About Me: Terminal Section -->
+		<section class="about-section-gap">
+			<div class="about-terminal-frame">
+				<!-- Window Header Bar -->
+				<div class="about-terminal-bar">
+					<span class="about-terminal-session"><?php echo esc_html( $session ); ?></span>
+					<div class="about-terminal-squares">
+						<div class="sq-box sq-red"></div>
+						<div class="sq-box sq-amber"></div>
+						<div class="sq-box sq-cyan"></div>
 					</div>
 				</div>
 
-				<div style="display: flex; gap: 12px; margin-top: 20px; font-size: 0.9rem; align-items: center;">
-					<span style="color: var(--gold); font-weight: bold;"><?php echo esc_html( $prompt ); ?></span>
-					<span class="cli-cursor"></span>
+				<!-- Terminal Body -->
+				<div class="about-terminal-body">
+					<!-- Command Input Row 1 -->
+					<div class="about-cli-row">
+						<span class="about-cli-prompt"><?php echo esc_html( $prompt ); ?></span>
+						<span class="about-cli-cmd"><?php echo esc_html( $command ); ?></span>
+					</div>
+
+					<!-- Content Block -->
+					<div class="about-cli-content">
+						<h1 class="about-hero-h1"><?php echo esc_html( $hero_title ); ?></h1>
+						<p class="about-hero-bio"><?php echo esc_html( $hero_bio ); ?></p>
+
+						<div class="about-hero-cols">
+							<?php if ( ! empty( $col1_title ) ) : ?>
+								<div>
+									<h2 class="about-col-h2"><?php echo esc_html( $col1_title ); ?></h2>
+									<ul class="about-col-list">
+										<?php
+										$lines1 = array_filter( array_map( 'trim', explode( "\n", $col1_items ) ) );
+										foreach ( $lines1 as $item ) :
+											?>
+											<li><span class="about-col-arrow">&gt;</span> <?php echo esc_html( $item ); ?></li>
+										<?php endforeach; ?>
+									</ul>
+								</div>
+							<?php endif; ?>
+
+							<?php if ( ! empty( $col2_title ) ) : ?>
+								<div>
+									<h2 class="about-col-h2"><?php echo esc_html( $col2_title ); ?></h2>
+									<ul class="about-col-list">
+										<?php
+										$lines2 = array_filter( array_map( 'trim', explode( "\n", $col2_items ) ) );
+										foreach ( $lines2 as $item ) :
+											?>
+											<li><span class="about-col-arrow">&gt;</span> <?php echo esc_html( $item ); ?></li>
+										<?php endforeach; ?>
+									</ul>
+								</div>
+							<?php endif; ?>
+						</div>
+					</div>
+
+					<!-- Command Input Row 2 (Blinking Cursor) -->
+					<div class="about-cli-row">
+						<span class="about-cli-prompt"><?php echo esc_html( $prompt ); ?></span>
+						<span class="about-cli-cursor"></span>
+					</div>
 				</div>
 			</div>
 		</section>
 	<?php endif; ?>
 
 	<?php if ( $show_modules ) : ?>
-		<!-- Section 2: System Modules -->
-		<section style="margin-bottom: 48px;">
-			<div class="section-header-wrap" style="margin-top: 0; margin-bottom: 24px;">
-				<h2 style="display: flex; align-items: center; gap: 10px;">
-					<span class="material-symbols-outlined"><?php echo esc_html( $mod_icon ); ?></span>
-					<span><?php echo esc_html( $mod_title ); ?></span>
-				</h2>
-				<div class="section-line"></div>
-			</div>
+		<!-- Tech Stack Grid -->
+		<section class="about-section-gap">
+			<h2 class="about-section-h2">
+				<span class="material-symbols-outlined"><?php echo esc_html( $mod_icon ); ?></span>
+				<span><?php echo esc_html( $mod_title ); ?></span>
+			</h2>
 
-			<div class="system-modules-grid">
+			<div class="about-modules-grid">
 				<?php foreach ( $modules as $m ) : ?>
 					<?php if ( ! empty( $m['legend'] ) ) : ?>
-						<fieldset class="system-module-card">
+						<fieldset class="about-module-fieldset">
 							<legend><?php echo esc_html( $m['legend'] ); ?></legend>
-							<div class="module-row">
-								<span style="color: var(--muted);"><?php echo esc_html( $m['row1_label'] ); ?></span>
-								<span class="module-badge"><?php echo esc_html( $m['row1_val'] ); ?></span>
-							</div>
-							<div class="module-row">
-								<span style="color: var(--muted);"><?php echo esc_html( $m['row2_label'] ); ?></span>
-								<span class="module-highlight"><?php echo esc_html( $m['row2_val'] ); ?></span>
-							</div>
-							<div class="module-desc">
-								<?php echo esc_html( $m['desc'] ); ?>
+							<div class="about-module-body">
+								<div class="about-module-row">
+									<span class="about-module-label"><?php echo esc_html( $m['row1_label'] ); ?></span>
+									<span class="about-module-badge"><?php echo esc_html( $m['row1_val'] ); ?></span>
+								</div>
+								<div class="about-module-row">
+									<span class="about-module-label"><?php echo esc_html( $m['row2_label'] ); ?></span>
+									<span class="about-module-highlight"><?php echo esc_html( $m['row2_val'] ); ?></span>
+								</div>
+								<div class="about-module-footer">
+									<p><?php echo esc_html( $m['desc'] ); ?></p>
+								</div>
 							</div>
 						</fieldset>
 					<?php endif; ?>
@@ -203,26 +195,31 @@ $cta_lens   = get_theme_mod( 'playpixelpro_about_cta_lens_id', 'LENS_ID: 0x4F2A'
 	<?php endif; ?>
 
 	<?php if ( $show_history ) : ?>
-		<!-- Section 3: Runtime History Timeline -->
-		<section class="runtime-timeline-wrap">
-			<div class="section-header-wrap" style="margin-top: 0; margin-bottom: 8px;">
-				<h2 style="display: flex; align-items: center; gap: 10px;">
+		<!-- Experience Log (Runtime History) -->
+		<section class="about-section-gap">
+			<div class="about-history-header">
+				<h2 class="about-section-h2" style="margin-bottom: 0;">
 					<span class="material-symbols-outlined"><?php echo esc_html( $history_icon ); ?></span>
 					<span><?php echo esc_html( $history_title ); ?></span>
 				</h2>
-				<div class="section-line"></div>
-				<span style="font-size: 0.8rem; color: var(--muted); font-family: var(--font-mono); font-weight: 600;"><?php echo esc_html( $history_filter ); ?></span>
+				<span class="about-history-filter"><?php echo esc_html( $history_filter ); ?></span>
 			</div>
 
-			<div class="runtime-timeline">
+			<div class="about-timeline-container">
 				<?php foreach ( $logs as $index => $log ) : ?>
 					<?php if ( ! empty( $log['title'] ) ) : ?>
-						<div class="timeline-entry">
-							<div class="timeline-dot <?php echo ( 1 === $index ) ? '' : 'muted'; ?>"></div>
-							<div class="timeline-date">
-								<?php echo esc_html( $log['date'] ); ?>
+						<div class="about-timeline-item">
+							<div class="about-timeline-marker <?php echo ( 1 === $index ) ? 'active' : ''; ?>"></div>
+							<div class="about-timeline-date">
+								<?php
+								$parts = explode( ' ', $log['date'], 2 );
+								$date_str = $parts[0];
+								$info_tag = isset( $parts[1] ) ? $parts[1] : 'INFO:';
+								?>
+								<span><?php echo esc_html( $date_str ); ?></span>
+								<span class="about-timeline-info"><?php echo esc_html( $info_tag ); ?></span>
 							</div>
-							<div class="timeline-card">
+							<div class="about-timeline-box">
 								<h3><?php echo esc_html( $log['title'] ); ?></h3>
 								<p><?php echo esc_html( $log['desc'] ); ?></p>
 							</div>
@@ -234,28 +231,29 @@ $cta_lens   = get_theme_mod( 'playpixelpro_about_cta_lens_id', 'LENS_ID: 0x4F2A'
 	<?php endif; ?>
 
 	<?php if ( $show_cta ) : ?>
-		<!-- Section 4: Call to Action -->
-		<section class="cta-deploy-section">
-			<div class="cta-deploy-grid">
-				<div class="cta-text-side">
-					<h2><?php echo esc_html( $cta_title ); ?></h2>
-					<p><?php echo esc_html( $cta_desc ); ?></p>
-					<div class="cta-btn-group">
-						<?php if ( ! empty( $cta_btn1 ) ) : ?>
-							<a href="<?php echo esc_url( $cta_url1 ); ?>" class="button heavy-btn"><?php echo esc_html( $cta_btn1 ); ?></a>
-						<?php endif; ?>
-						<?php if ( ! empty( $cta_btn2 ) ) : ?>
-							<a href="<?php echo esc_url( $cta_url2 ); ?>" class="button" style="border-color: var(--line); color: var(--text);"><?php echo esc_html( $cta_btn2 ); ?></a>
-						<?php endif; ?>
-					</div>
-				</div>
-
-				<div class="cta-image-side">
-					<img src="<?php echo esc_url( $cta_image ); ?>" alt="Developer Studio Macro" class="cta-image-bg" />
-					<?php if ( ! empty( $cta_lens ) ) : ?>
-						<div class="cta-lens-tag"><?php echo esc_html( $cta_lens ); ?></div>
+		<!-- Call to Action / Terminal -->
+		<section class="about-cta-grid">
+			<div class="about-cta-text">
+				<h2><?php echo esc_html( $cta_title ); ?></h2>
+				<p><?php echo esc_html( $cta_desc ); ?></p>
+				<div class="about-cta-buttons">
+					<?php if ( ! empty( $cta_btn1 ) ) : ?>
+						<a href="<?php echo esc_url( $cta_url1 ); ?>" class="about-btn-primary"><?php echo esc_html( $cta_btn1 ); ?></a>
+					<?php endif; ?>
+					<?php if ( ! empty( $cta_btn2 ) ) : ?>
+						<a href="<?php echo esc_url( $cta_url2 ); ?>" class="about-btn-secondary"><?php echo esc_html( $cta_btn2 ); ?></a>
 					<?php endif; ?>
 				</div>
+			</div>
+
+			<div class="about-cta-media">
+				<div class="about-cta-img" style="background-image: url('<?php echo esc_url( $cta_image ); ?>');"></div>
+				<div class="about-cta-overlay"></div>
+				<?php if ( ! empty( $cta_lens ) ) : ?>
+					<div class="about-cta-lens">
+						<span><?php echo esc_html( $cta_lens ); ?></span>
+					</div>
+				<?php endif; ?>
 			</div>
 		</section>
 	<?php endif; ?>
