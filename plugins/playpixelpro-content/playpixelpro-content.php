@@ -698,9 +698,7 @@ function ppp_download_shortcode( $atts ) {
 		esc_html__( 'VIEW_DOWNLOAD', 'playpixelpro-content' )
 	);
 }
-add_action( 'init', function() {
-	add_shortcode( 'game-card', 'ppp_download_shortcode' );
-} );
+add_shortcode( 'game-card', 'ppp_download_shortcode' );
 
 function ppp_terminal_box_shortcode( $atts, $content = null ) {
 	$atts = shortcode_atts( array( 'title' => 'TERMINAL_WINDOW' ), $atts, 'terminal-box' );
@@ -744,3 +742,482 @@ function ppp_social_shortcode() {
 	return $out;
 }
 add_shortcode( 'social-links', 'ppp_social_shortcode' );
+
+/* ==========================================================================
+   PlayPixelPro Contact Transmission Engine, SMTP, Bot Fight & Newsletter System
+   ========================================================================== */
+
+// 1. Activation & Table Initialization
+function ppp_create_subscriber_table() {
+	global $wpdb;
+	$table_name = $wpdb->prefix . 'ppp_subscribers';
+	$charset_collate = $wpdb->get_charset_collate();
+
+	$sql = "CREATE TABLE IF NOT EXISTS {$table_name} (
+		id bigint(20) NOT NULL AUTO_INCREMENT,
+		name varchar(100) NOT NULL DEFAULT '',
+		email varchar(100) NOT NULL DEFAULT '',
+		subscribed_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+		status varchar(20) DEFAULT 'active' NOT NULL,
+		PRIMARY KEY  (id),
+		UNIQUE KEY email (email)
+	) {$charset_collate};";
+
+	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+	dbDelta( $sql );
+}
+register_activation_hook( __FILE__, 'ppp_create_subscriber_table' );
+add_action( 'admin_init', 'ppp_create_subscriber_table' );
+
+// 2. Add Submenu Page under PlayPixelPro Admin Menu
+function ppp_add_contact_settings_menu() {
+	add_submenu_page(
+		'edit.php?post_type=downloads',
+		__( 'Contact & Mail Settings', 'playpixelpro-content' ),
+		__( 'Contact & Mail Settings', 'playpixelpro-content' ),
+		'manage_options',
+		'ppp-mail-settings',
+		'ppp_render_contact_settings_page'
+	);
+}
+add_action( 'admin_menu', 'ppp_add_contact_settings_menu' );
+
+// 3. Configure PHPMailer via phpmailer_init
+function ppp_setup_custom_smtp( $phpmailer ) {
+	$smtp_enabled = get_option( 'ppp_smtp_enabled', false );
+	if ( ! $smtp_enabled ) {
+		return;
+	}
+
+	$smtp_host  = get_option( 'ppp_smtp_host', '' );
+	$smtp_port  = get_option( 'ppp_smtp_port', '587' );
+	$smtp_enc   = get_option( 'ppp_smtp_encryption', 'tls' );
+	$smtp_user  = get_option( 'ppp_smtp_user', '' );
+	$smtp_pass  = get_option( 'ppp_smtp_pass', '' );
+	$from_email = get_option( 'ppp_smtp_from_email', '' );
+	$from_name  = get_option( 'ppp_smtp_from_name', '' );
+
+	if ( ! empty( $smtp_host ) ) {
+		$phpmailer->isSMTP();
+		$phpmailer->Host       = $smtp_host;
+		$phpmailer->Port       = absint( $smtp_port );
+		$phpmailer->SMTPAuth   = ! empty( $smtp_user );
+		$phpmailer->Username   = $smtp_user;
+		$phpmailer->Password   = $smtp_pass;
+
+		if ( 'ssl' === $smtp_enc || 'tls' === $smtp_enc ) {
+			$phpmailer->SMTPSecure = $smtp_enc;
+		} else {
+			$phpmailer->SMTPSecure = '';
+			$phpmailer->SMTPAutoTLS = false;
+		}
+
+		if ( ! empty( $from_email ) ) {
+			$phpmailer->From     = $from_email;
+			$phpmailer->FromName = ! empty( $from_name ) ? $from_name : get_bloginfo( 'name' );
+		}
+	}
+}
+add_action( 'phpmailer_init', 'ppp_setup_custom_smtp' );
+
+// 4. Bot Protection Verification Function (Turnstile & reCAPTCHA)
+function ppp_verify_bot_protection( $token, $provider, $secret_key ) {
+	if ( 'none' === $provider || empty( $provider ) || empty( $secret_key ) ) {
+		return true;
+	}
+
+	if ( empty( $token ) ) {
+		return false;
+	}
+
+	$verify_url = '';
+	if ( 'turnstile' === $provider ) {
+		$verify_url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+	} elseif ( 'recaptcha_v2' === $provider || 'recaptcha_v3' === $provider ) {
+		$verify_url = 'https://www.google.com/recaptcha/api/siteverify';
+	}
+
+	if ( empty( $verify_url ) ) {
+		return true;
+	}
+
+	$response = wp_remote_post(
+		$verify_url,
+		array(
+			'body' => array(
+				'secret'   => $secret_key,
+				'response' => $token,
+				'remoteip' => isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( $_SERVER['REMOTE_ADDR'] ) : '',
+			),
+		)
+	);
+
+	if ( is_wp_error( $response ) ) {
+		return false;
+	}
+
+	$body = wp_remote_retrieve_body( $response );
+	$data = json_decode( $body, true );
+
+	return ( isset( $data['success'] ) && true === $data['success'] );
+}
+
+// 5. CSV Export Handler
+function ppp_export_subscribers_csv() {
+	if ( isset( $_GET['page'] ) && 'ppp-mail-settings' === $_GET['page'] && isset( $_GET['action'] ) && 'export_csv' === $_GET['action'] ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( __( 'Unauthorized access.', 'playpixelpro-content' ) );
+		}
+
+		global $wpdb;
+		$table_name  = $wpdb->prefix . 'ppp_subscribers';
+		$subscribers = $wpdb->get_results( "SELECT * FROM {$table_name} ORDER BY id DESC", ARRAY_A );
+
+		header( 'Content-Type: text/csv; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename=newsletter_subscribers_' . date( 'Y-m-d' ) . '.csv' );
+		$output = fopen( 'php://output', 'w' );
+		fputcsv( $output, array( 'ID', 'Name', 'Email', 'Subscribed Date', 'Status' ) );
+
+		if ( ! empty( $subscribers ) ) {
+			foreach ( $subscribers as $row ) {
+				fputcsv( $output, $row );
+			}
+		}
+		fclose( $output );
+		exit;
+	}
+}
+add_action( 'admin_init', 'ppp_export_subscribers_csv' );
+
+// 6. Admin Settings Page Renderer
+function ppp_render_contact_settings_page() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	$active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'smtp';
+	$notice     = '';
+
+	// Handle Settings Save
+	if ( isset( $_POST['ppp_save_mail_settings'] ) && check_admin_referer( 'ppp_mail_settings_action', 'ppp_mail_settings_nonce' ) ) {
+		if ( 'smtp' === $active_tab ) {
+			update_option( 'ppp_smtp_enabled', isset( $_POST['ppp_smtp_enabled'] ) );
+			update_option( 'ppp_smtp_host', sanitize_text_field( $_POST['ppp_smtp_host'] ) );
+			update_option( 'ppp_smtp_port', absint( $_POST['ppp_smtp_port'] ) );
+			update_option( 'ppp_smtp_encryption', sanitize_key( $_POST['ppp_smtp_encryption'] ) );
+			update_option( 'ppp_smtp_user', sanitize_text_field( $_POST['ppp_smtp_user'] ) );
+			if ( ! empty( $_POST['ppp_smtp_pass'] ) ) {
+				update_option( 'ppp_smtp_pass', sanitize_text_field( $_POST['ppp_smtp_pass'] ) );
+			}
+			update_option( 'ppp_smtp_from_email', sanitize_email( $_POST['ppp_smtp_from_email'] ) );
+			update_option( 'ppp_smtp_from_name', sanitize_text_field( $_POST['ppp_smtp_from_name'] ) );
+			$notice = __( 'SMTP Settings saved successfully.', 'playpixelpro-content' );
+		} elseif ( 'bot' === $active_tab ) {
+			update_option( 'ppp_bot_provider', sanitize_key( $_POST['ppp_bot_provider'] ) );
+			update_option( 'ppp_bot_site_key', sanitize_text_field( $_POST['ppp_bot_site_key'] ) );
+			update_option( 'ppp_bot_secret_key', sanitize_text_field( $_POST['ppp_bot_secret_key'] ) );
+			$notice = __( 'Bot Fight Protection Settings saved successfully.', 'playpixelpro-content' );
+		}
+	}
+
+	// Handle Test Email Dispatch
+	if ( isset( $_POST['ppp_send_test_email'] ) && check_admin_referer( 'ppp_mail_settings_action', 'ppp_mail_settings_nonce' ) ) {
+		$test_recipient = sanitize_email( $_POST['ppp_test_recipient'] );
+		if ( ! empty( $test_recipient ) ) {
+			$sent = wp_mail(
+				$test_recipient,
+				'[PlayPixelPro] Test Transmission Packet',
+				"Greetings,\n\nThis is a test email transmission packet sent from your PlayPixelPro site using the configured SMTP server.\n\nStatus: OK\nTimestamp: " . date( 'Y-m-d H:i:s' )
+			);
+			if ( $sent ) {
+				$notice = sprintf( __( 'Test email transmission packet successfully delivered to %s.', 'playpixelpro-content' ), esc_html( $test_recipient ) );
+			} else {
+				$notice = __( 'Test email transmission failed. Please check your SMTP host, authentication, and port credentials.', 'playpixelpro-content' );
+			}
+		}
+	}
+
+	// Handle Broadcast Newsletter
+	if ( isset( $_POST['ppp_send_newsletter_broadcast'] ) && check_admin_referer( 'ppp_mail_settings_action', 'ppp_mail_settings_nonce' ) ) {
+		$subject = sanitize_text_field( $_POST['ppp_broadcast_subject'] );
+		$body    = wp_kses_post( $_POST['ppp_broadcast_body'] );
+
+		global $wpdb;
+		$table_name  = $wpdb->prefix . 'ppp_subscribers';
+		$subscribers = $wpdb->get_col( "SELECT email FROM {$table_name} WHERE status = 'active'" );
+
+		if ( ! empty( $subscribers ) && ! empty( $subject ) && ! empty( $body ) ) {
+			$count = 0;
+			foreach ( $subscribers as $sub_email ) {
+				if ( wp_mail( $sub_email, $subject, $body, array( 'Content-Type: text/html; charset=UTF-8' ) ) ) {
+					$count++;
+				}
+			}
+			$notice = sprintf( __( 'Newsletter broadcast sent successfully to %d active subscribers!', 'playpixelpro-content' ), $count );
+		} else {
+			$notice = __( 'No active subscribers found or subject/body were empty.', 'playpixelpro-content' );
+		}
+	}
+
+	// Fetch Options
+	$smtp_enabled = get_option( 'ppp_smtp_enabled', false );
+	$smtp_host    = get_option( 'ppp_smtp_host', '' );
+	$smtp_port    = get_option( 'ppp_smtp_port', '587' );
+	$smtp_enc     = get_option( 'ppp_smtp_encryption', 'tls' );
+	$smtp_user    = get_option( 'ppp_smtp_user', '' );
+	$smtp_pass    = get_option( 'ppp_smtp_pass', '' );
+	$from_email   = get_option( 'ppp_smtp_from_email', get_bloginfo( 'admin_email' ) );
+	$from_name    = get_option( 'ppp_smtp_from_name', get_bloginfo( 'name' ) );
+
+	$bot_provider = get_option( 'ppp_bot_provider', 'none' );
+	$bot_site_key = get_option( 'ppp_bot_site_key', '' );
+	$bot_sec_key  = get_option( 'ppp_bot_secret_key', '' );
+
+	global $wpdb;
+	$table_name  = $wpdb->prefix . 'ppp_subscribers';
+	$subscribers = $wpdb->get_results( "SELECT * FROM {$table_name} ORDER BY id DESC LIMIT 50", ARRAY_A );
+	$total_subs  = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name}" );
+	?>
+	<div class="wrap">
+		<h1 class="wp-heading-inline" style="font-family: monospace; color: #16130b;"><?php esc_html_e( 'PlayPixelPro // Contact & Mail Settings', 'playpixelpro-content' ); ?></h1>
+		<hr class="wp-header-end">
+
+		<?php if ( ! empty( $notice ) ) : ?>
+			<div class="notice notice-info is-dismissible"><p><?php echo esc_html( $notice ); ?></p></div>
+		<?php endif; ?>
+
+		<nav class="nav-tab-wrapper" style="margin-top: 15px;">
+			<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=downloads&page=ppp-mail-settings&tab=smtp' ) ); ?>" class="nav-tab <?php echo 'smtp' === $active_tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'SMTP Mailer Config', 'playpixelpro-content' ); ?></a>
+			<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=downloads&page=ppp-mail-settings&tab=bot' ) ); ?>" class="nav-tab <?php echo 'bot' === $active_tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Bot Fight & Protection (Turnstile / reCAPTCHA)', 'playpixelpro-content' ); ?></a>
+			<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=downloads&page=ppp-mail-settings&tab=newsletter' ) ); ?>" class="nav-tab <?php echo 'newsletter' === $active_tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Newsletter & Subscribers', 'playpixelpro-content' ); ?></a>
+		</nav>
+
+		<div class="tab-content" style="background: #fff; padding: 24px; border: 1px solid #ccc; border-top: 0; max-width: 900px;">
+			<?php if ( 'smtp' === $active_tab ) : ?>
+				<form method="POST" action="">
+					<?php wp_nonce_field( 'ppp_mail_settings_action', 'ppp_mail_settings_nonce' ); ?>
+					<h2><?php esc_html_e( 'SMTP Mail Server Credentials', 'playpixelpro-content' ); ?></h2>
+					<p><?php esc_html_e( 'Route contact transmissions and newsletter broadcasts through your custom SMTP server (Gmail, Mailgun, Office 365, etc.).', 'playpixelpro-content' ); ?></p>
+
+					<table class="form-table">
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Enable Custom SMTP', 'playpixelpro-content' ); ?></th>
+							<td>
+								<label><input type="checkbox" name="ppp_smtp_enabled" value="1" <?php checked( $smtp_enabled ); ?>> <?php esc_html_e( 'Use custom SMTP for all outgoing wp_mail() transmissions', 'playpixelpro-content' ); ?></label>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'SMTP Host', 'playpixelpro-content' ); ?></th>
+							<td><input type="text" name="ppp_smtp_host" value="<?php echo esc_attr( $smtp_host ); ?>" class="regular-text" placeholder="smtp.example.com"></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'SMTP Port', 'playpixelpro-content' ); ?></th>
+							<td><input type="number" name="ppp_smtp_port" value="<?php echo esc_attr( $smtp_port ); ?>" class="small-text"> <span class="description">Standard: 587 (TLS), 465 (SSL), 25 (None)</span></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Encryption', 'playpixelpro-content' ); ?></th>
+							<td>
+								<select name="ppp_smtp_encryption">
+									<option value="tls" <?php selected( $smtp_enc, 'tls' ); ?>>TLS (Recommended)</option>
+									<option value="ssl" <?php selected( $smtp_enc, 'ssl' ); ?>>SSL</option>
+									<option value="none" <?php selected( $smtp_enc, 'none' ); ?>>None</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'SMTP Username', 'playpixelpro-content' ); ?></th>
+							<td><input type="text" name="ppp_smtp_user" value="<?php echo esc_attr( $smtp_user ); ?>" class="regular-text"></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'SMTP Password', 'playpixelpro-content' ); ?></th>
+							<td><input type="password" name="ppp_smtp_pass" value="<?php echo esc_attr( $smtp_pass ); ?>" class="regular-text"></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'From Email Address', 'playpixelpro-content' ); ?></th>
+							<td><input type="email" name="ppp_smtp_from_email" value="<?php echo esc_attr( $from_email ); ?>" class="regular-text"></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'From Sender Name', 'playpixelpro-content' ); ?></th>
+							<td><input type="text" name="ppp_smtp_from_name" value="<?php echo esc_attr( $from_name ); ?>" class="regular-text"></td>
+						</tr>
+					</table>
+
+					<p class="submit"><input type="submit" name="ppp_save_mail_settings" class="button button-primary" value="<?php esc_attr_e( 'Save SMTP Settings', 'playpixelpro-content' ); ?>"></p>
+				</form>
+
+				<hr style="margin: 30px 0;">
+
+				<form method="POST" action="">
+					<?php wp_nonce_field( 'ppp_mail_settings_action', 'ppp_mail_settings_nonce' ); ?>
+					<h3><?php esc_html_e( 'Test SMTP Transmission', 'playpixelpro-content' ); ?></h3>
+					<p><input type="email" name="ppp_test_recipient" value="<?php echo esc_attr( wp_get_current_user()->user_email ); ?>" class="regular-text" placeholder="recipient@example.com">
+					<input type="submit" name="ppp_send_test_email" class="button button-secondary" value="<?php esc_attr_e( 'Send Test Transmission Packet', 'playpixelpro-content' ); ?>"></p>
+				</form>
+
+			<?php elseif ( 'bot' === $active_tab ) : ?>
+				<form method="POST" action="">
+					<?php wp_nonce_field( 'ppp_mail_settings_action', 'ppp_mail_settings_nonce' ); ?>
+					<h2><?php esc_html_e( 'Bot Fight & Spam Protection Settings', 'playpixelpro-content' ); ?></h2>
+					<p><?php esc_html_e( 'Prevent automated spam packets on the Contact Terminal page using Cloudflare Turnstile or Google reCAPTCHA.', 'playpixelpro-content' ); ?></p>
+
+					<table class="form-table">
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Bot Fight Provider', 'playpixelpro-content' ); ?></th>
+							<td>
+								<select name="ppp_bot_provider">
+									<option value="none" <?php selected( $bot_provider, 'none' ); ?>>Disabled (None)</option>
+									<option value="turnstile" <?php selected( $bot_provider, 'turnstile' ); ?>>Cloudflare Turnstile (Recommended)</option>
+									<option value="recaptcha_v2" <?php selected( $bot_provider, 'recaptcha_v2' ); ?>>Google reCAPTCHA v2 Checkbox</option>
+									<option value="recaptcha_v3" <?php selected( $bot_provider, 'recaptcha_v3' ); ?>>Google reCAPTCHA v3 Invisible</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Site Key (Public)', 'playpixelpro-content' ); ?></th>
+							<td><input type="text" name="ppp_bot_site_key" value="<?php echo esc_attr( $bot_site_key ); ?>" class="large-text"></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Secret Key (Private)', 'playpixelpro-content' ); ?></th>
+							<td><input type="password" name="ppp_bot_secret_key" value="<?php echo esc_attr( $bot_sec_key ); ?>" class="large-text"></td>
+						</tr>
+					</table>
+
+					<p class="submit"><input type="submit" name="ppp_save_mail_settings" class="button button-primary" value="<?php esc_attr_e( 'Save Bot Protection Settings', 'playpixelpro-content' ); ?>"></p>
+				</form>
+
+			<?php elseif ( 'newsletter' === $active_tab ) : ?>
+				<div style="display: flex; justify-content: space-between; align-items: center;">
+					<h2><?php esc_html_e( 'Subscribers Database', 'playpixelpro-content' ); ?> (<?php echo esc_html( absint( $total_subs ) ); ?> total)</h2>
+					<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=downloads&page=ppp-mail-settings&tab=newsletter&action=export_csv' ) ); ?>" class="button button-secondary"><?php esc_html_e( 'Export Subscribers CSV', 'playpixelpro-content' ); ?></a>
+				</div>
+
+				<table class="widefat fixed striped" style="margin-top: 15px;">
+					<thead>
+						<tr>
+							<th style="width: 50px;">ID</th>
+							<th>Name / Username</th>
+							<th>Return Email Address</th>
+							<th>Subscribed Date</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php if ( ! empty( $subscribers ) ) : ?>
+							<?php foreach ( $subscribers as $sub ) : ?>
+								<tr>
+									<td><?php echo esc_html( $sub['id'] ); ?></td>
+									<td><strong><?php echo esc_html( $sub['name'] ); ?></strong></td>
+									<td><?php echo esc_html( $sub['email'] ); ?></td>
+									<td><?php echo esc_html( $sub['subscribed_at'] ); ?></td>
+									<td><span class="badge" style="background: #28a745; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 11px;"><?php echo esc_html( strtoupper( $sub['status'] ) ); ?></span></td>
+								</tr>
+							<?php endforeach; ?>
+						<?php else : ?>
+							<tr><td colspan="5"><?php esc_html_e( 'No newsletter subscribers found yet.', 'playpixelpro-content' ); ?></td></tr>
+						<?php endif; ?>
+					</tbody>
+				</table>
+
+				<hr style="margin: 30px 0;">
+
+				<h2><?php esc_html_e( 'Broadcast Newsletter Email Dispatcher', 'playpixelpro-content' ); ?></h2>
+				<form method="POST" action="">
+					<?php wp_nonce_field( 'ppp_mail_settings_action', 'ppp_mail_settings_nonce' ); ?>
+					<table class="form-table">
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Newsletter Subject', 'playpixelpro-content' ); ?></th>
+							<td><input type="text" name="ppp_broadcast_subject" class="large-text" placeholder="[DEV_ROOT] System Update Broadcast #01"></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Newsletter Content', 'playpixelpro-content' ); ?></th>
+							<td>
+								<?php
+								wp_editor(
+									'',
+									'ppp_broadcast_body',
+									array(
+										'textarea_name' => 'ppp_broadcast_body',
+										'textarea_rows' => 10,
+										'media_buttons' => true,
+									)
+								);
+								?>
+							</td>
+						</tr>
+					</table>
+					<p class="submit"><input type="submit" name="ppp_send_newsletter_broadcast" class="button button-primary" value="<?php esc_attr_e( 'Broadcast Newsletter to All Active Subscribers', 'playpixelpro-content' ); ?>" onclick="return confirm('Are you sure you want to broadcast this newsletter email to all active subscribers?');"></p>
+				</form>
+			<?php endif; ?>
+		</div>
+	</div>
+	<?php
+}
+
+// 7. AJAX Contact Transmission Form Handler
+function ppp_ajax_send_contact_packet() {
+	check_ajax_referer( 'ppp_contact_nonce', 'security' );
+
+	$username  = isset( $_POST['username'] ) ? sanitize_text_field( $_POST['username'] ) : '';
+	$email     = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
+	$message   = isset( $_POST['message'] ) ? sanitize_textarea_field( $_POST['message'] ) : '';
+	$subscribe = isset( $_POST['subscribe'] ) ? ( '1' === (string) $_POST['subscribe'] || 'true' === (string) $_POST['subscribe'] ) : false;
+	$token     = isset( $_POST['bot_token'] ) ? sanitize_text_field( $_POST['bot_token'] ) : '';
+
+	if ( empty( $username ) || empty( $email ) || empty( $message ) ) {
+		wp_send_json_error( array( 'message' => '[ERROR_0x01]: MISSING_REQUIRED_PAYLOAD_FIELDS' ) );
+	}
+
+	if ( ! is_email( $email ) ) {
+		wp_send_json_error( array( 'message' => '[ERROR_0x02]: INVALID_RETURN_ADDR_FORMAT' ) );
+	}
+
+	// Verify Bot Fight Protection
+	$provider   = get_option( 'ppp_bot_provider', 'none' );
+	$secret_key = get_option( 'ppp_bot_secret_key', '' );
+
+	if ( ! ppp_verify_bot_protection( $token, $provider, $secret_key ) ) {
+		wp_send_json_error( array( 'message' => '[ERROR_0x03]: BOT_PROTECTION_CHALLENGE_FAILED' ) );
+	}
+
+	// Handle Newsletter Subscription
+	if ( $subscribe ) {
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'ppp_subscribers';
+		$wpdb->replace(
+			$table_name,
+			array(
+				'name'          => $username,
+				'email'         => $email,
+				'subscribed_at' => current_time( 'mysql' ),
+				'status'        => 'active',
+			),
+			array( '%s', '%s', '%s', '%s' )
+		);
+	}
+
+	// Send Email to Admin
+	$admin_email = get_option( 'ppp_smtp_from_email', get_bloginfo( 'admin_email' ) );
+	$subject     = '[CONNECT.SH] Transmission Packet from ' . $username;
+	$body        = "SECURITY ENCRYPTED TRANSMISSION PACKET\n";
+	$body       .= "========================================\n\n";
+	$body       .= "USERNAME_STR: " . $username . "\n";
+	$body       .= "RETURN_ADDR:  " . $email . "\n";
+	$body       .= "NEWSLETTER:   " . ( $subscribe ? 'OPTED_IN' : 'NO' ) . "\n";
+	$body       .= "TIMESTAMP:    " . current_time( 'mysql' ) . "\n\n";
+	$body       .= "DATA_PAYLOAD:\n" . $message . "\n\n";
+	$body       .= "========================================\n";
+
+	$headers = array(
+		'Reply-To: ' . $username . ' <' . $email . '>',
+	);
+
+	$sent = wp_mail( $admin_email, $subject, $body, $headers );
+
+	if ( $sent ) {
+		wp_send_json_success( array( 'message' => '[SUCCESS_0x00]: TRANSMISSION_PACKET_DELIVERED_OK' ) );
+	} else {
+		wp_send_json_error( array( 'message' => '[ERROR_0x04]: TRANSMISSION_UPLINK_FAILED' ) );
+	}
+}
+add_action( 'wp_ajax_ppp_send_contact_packet', 'ppp_ajax_send_contact_packet' );
+add_action( 'wp_ajax_nopriv_ppp_send_contact_packet', 'ppp_ajax_send_contact_packet' );

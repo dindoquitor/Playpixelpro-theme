@@ -52,4 +52,73 @@
 			progressBar.style.width = newWidth + '%';
 		}, 1500);
 	}
+
+	// Contact Form Terminal Transmission AJAX Handler
+	var contactForm = document.getElementById('contact-terminal-form');
+	if (contactForm) {
+		contactForm.addEventListener('submit', function (e) {
+			e.preventDefault();
+
+			var submitBtn = document.getElementById('contact-submit-btn');
+			var outputBox = document.getElementById('contact-cli-output');
+			var nonceVal  = contactForm.querySelector('input[name="contact_nonce"]').value;
+			var username  = contactForm.querySelector('input[name="username"]').value;
+			var email     = contactForm.querySelector('input[name="email"]').value;
+			var message   = contactForm.querySelector('textarea[name="message"]').value;
+			var subscribe = contactForm.querySelector('input[name="subscribe"]').checked ? 1 : 0;
+
+			var botToken = '';
+			var cfTurnstile = contactForm.querySelector('input[name="cf-turnstile-response"]');
+			var gRecaptcha  = contactForm.querySelector('textarea[name="g-recaptcha-response"]') || contactForm.querySelector('input[name="g-recaptcha-response"]');
+			if (cfTurnstile) {
+				botToken = cfTurnstile.value;
+			} else if (gRecaptcha) {
+				botToken = gRecaptcha.value;
+			}
+
+			if (submitBtn) {
+				submitBtn.disabled = true;
+				submitBtn.innerHTML = '<span>TRANSMITTING_PACKET...</span>';
+			}
+
+			if (outputBox) {
+				outputBox.style.display = 'block';
+				outputBox.innerHTML = '&gt; INITIALIZING_SOCKET_CONNECTION... [PENDING]';
+			}
+
+			var formData = new FormData();
+			formData.append('action', 'ppp_send_contact_packet');
+			formData.append('security', nonceVal);
+			formData.append('username', username);
+			formData.append('email', email);
+			formData.append('message', message);
+			formData.append('subscribe', subscribe);
+			formData.append('bot_token', botToken);
+
+			var ajaxUrl = (window.pppData && window.pppData.ajaxUrl) ? window.pppData.ajaxUrl : '/wp-admin/admin-ajax.php';
+
+			fetch(ajaxUrl, {
+				method: 'POST',
+				body: formData
+			})
+			.then(function (res) { return res.json(); })
+			.then(function (data) {
+				if (data.success) {
+					outputBox.innerHTML = '&gt; ' + data.data.message;
+					contactForm.reset();
+				} else {
+					outputBox.innerHTML = '&gt; ' + (data.data ? data.data.message : '[ERROR_0x99]: TRANSMISSION_FAILED');
+				}
+			})
+			.catch(function () {
+				outputBox.innerHTML = '&gt; [ERROR_0x99]: SERVER_UNREACHABLE';
+			})
+			.finally(function () {
+				if (submitBtn) {
+					submitBtn.disabled = false;
+					submitBtn.innerHTML = '<span>SEND_PACKET</span>';
+				}
+			});
+		});
+	}
 }());

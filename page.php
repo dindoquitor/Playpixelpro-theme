@@ -11,12 +11,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
-$about_page_id  = (int) get_theme_mod( 'playpixelpro_about_page', 0 );
+$about_page_id   = (int) get_theme_mod( 'playpixelpro_about_page', 0 );
+$contact_page_id = (int) get_theme_mod( 'playpixelpro_contact_page', 0 );
 $current_page_id = get_the_ID();
 $template_slug   = get_page_template_slug( $current_page_id );
 
 if ( ( $about_page_id > 0 && $about_page_id === $current_page_id ) || 'page-templates/template-about.php' === $template_slug ) {
 	get_template_part( 'page-templates/content', 'about' );
+	get_footer();
+	return;
+}
+
+if ( ( $contact_page_id > 0 && $contact_page_id === $current_page_id ) || 'page-templates/template-contact.php' === $template_slug ) {
+	get_template_part( 'page-templates/content', 'contact' );
 	get_footer();
 	return;
 }

@@ -772,6 +772,84 @@ function playpixelpro_customize_register( $wp_customize ) {
 			'sanitize_callback' => 'absint',
 		)
 	);
+
+	// ==========================================================================
+	// Section: Contact Terminal Page Options
+	// ==========================================================================
+	$wp_customize->add_section(
+		'playpixelpro_contact_section',
+		array(
+			'title'    => __( 'Contact Page Options', 'playpixelpro' ),
+			'panel'    => 'playpixelpro_panel',
+			'priority' => 46,
+		)
+	);
+
+	// Static Contact Page Assignment
+	$wp_customize->add_setting(
+		'playpixelpro_contact_page',
+		array(
+			'default'           => 0,
+			'sanitize_callback' => 'absint',
+		)
+	);
+	$wp_customize->add_control(
+		'playpixelpro_contact_page',
+		array(
+			'label'       => __( 'Select Static Contact Page', 'playpixelpro' ),
+			'description' => __( 'Assign a static page to render the Contact Terminal Page layout.', 'playpixelpro' ),
+			'section'     => 'playpixelpro_contact_section',
+			'type'        => 'dropdown-pages',
+		)
+	);
+
+	// Contact Terminal Uplink Tag
+	$wp_customize->add_setting( 'playpixelpro_contact_uplink_tag', array( 'default' => 'ESTABLISHING_UPLINK', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_contact_uplink_tag', array( 'label' => __( 'Uplink Badge Tag', 'playpixelpro' ), 'section' => 'playpixelpro_contact_section', 'type' => 'text' ) );
+
+	// Contact Title & Description
+	$wp_customize->add_setting( 'playpixelpro_contact_title', array( 'default' => '> CONNECT.SH', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_contact_title', array( 'label' => __( 'Contact Terminal Title', 'playpixelpro' ), 'section' => 'playpixelpro_contact_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_contact_desc', array( 'default' => 'Direct transmission interface. Send secure packets to the administrator. Response times vary based on server load and local latency.', 'sanitize_callback' => 'sanitize_textarea_field' ) );
+	$wp_customize->add_control( 'playpixelpro_contact_desc', array( 'label' => __( 'Contact Terminal Description', 'playpixelpro' ), 'section' => 'playpixelpro_contact_section', 'type' => 'textarea' ) );
+
+	// Nano Editor Title
+	$wp_customize->add_setting( 'playpixelpro_contact_nano_title', array( 'default' => 'NANO 8.0 // protocol_message.md', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_contact_nano_title', array( 'label' => __( 'Nano Editor Window Legend Title', 'playpixelpro' ), 'section' => 'playpixelpro_contact_section', 'type' => 'text' ) );
+
+	// Form Labels
+	$wp_customize->add_setting( 'playpixelpro_contact_label_user', array( 'default' => '[01] USERNAME_STR', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_contact_label_user', array( 'label' => __( 'Field 1 Label (Username)', 'playpixelpro' ), 'section' => 'playpixelpro_contact_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_contact_label_email', array( 'default' => '[02] RETURN_ADDR', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_contact_label_email', array( 'label' => __( 'Field 2 Label (Email)', 'playpixelpro' ), 'section' => 'playpixelpro_contact_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_contact_label_msg', array( 'default' => '[03] DATA_PAYLOAD', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_contact_label_msg', array( 'label' => __( 'Field 3 Label (Message)', 'playpixelpro' ), 'section' => 'playpixelpro_contact_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_contact_label_newsletter', array( 'default' => 'SECURE_ENCRYPT', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_contact_label_newsletter', array( 'label' => __( 'Newsletter Opt-in Checkbox Label', 'playpixelpro' ), 'section' => 'playpixelpro_contact_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_contact_btn_text', array( 'default' => 'SEND_PACKET', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_contact_btn_text', array( 'label' => __( 'Submit Button Text', 'playpixelpro' ), 'section' => 'playpixelpro_contact_section', 'type' => 'text' ) );
+
+	// Right Column SYS_STATUS Specs
+	$wp_customize->add_setting( 'playpixelpro_contact_sys_loc', array( 'default' => 'BERLIN_DE_01', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_contact_sys_loc', array( 'label' => __( 'SYS_STATUS Location', 'playpixelpro' ), 'section' => 'playpixelpro_contact_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_contact_sys_temp', array( 'default' => '32.4°C', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_contact_sys_temp', array( 'label' => __( 'SYS_STATUS Temp', 'playpixelpro' ), 'section' => 'playpixelpro_contact_section', 'type' => 'text' ) );
+
+	// Social Nodes
+	$wp_customize->add_setting( 'playpixelpro_contact_github', array( 'default' => 'https://github.com', 'sanitize_callback' => 'esc_url_raw' ) );
+	$wp_customize->add_control( 'playpixelpro_contact_github', array( 'label' => __( 'GitHub URL', 'playpixelpro' ), 'section' => 'playpixelpro_contact_section', 'type' => 'url' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_contact_twitter', array( 'default' => 'https://x.com', 'sanitize_callback' => 'esc_url_raw' ) );
+	$wp_customize->add_control( 'playpixelpro_contact_twitter', array( 'label' => __( 'Twitter / X URL', 'playpixelpro' ), 'section' => 'playpixelpro_contact_section', 'type' => 'url' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_contact_stackoverflow', array( 'default' => 'https://stackoverflow.com', 'sanitize_callback' => 'esc_url_raw' ) );
+	$wp_customize->add_control( 'playpixelpro_contact_stackoverflow', array( 'label' => __( 'Stack Overflow URL', 'playpixelpro' ), 'section' => 'playpixelpro_contact_section', 'type' => 'url' ) );
 	$wp_customize->add_control(
 		new WP_Customize_Control(
 			$wp_customize,

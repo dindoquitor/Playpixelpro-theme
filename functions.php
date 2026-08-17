@@ -92,6 +92,14 @@ function playpixelpro_assets() {
 		true
 	);
 
+	wp_localize_script(
+		'playpixelpro',
+		'pppData',
+		array(
+			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+		)
+	);
+
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
 	}
