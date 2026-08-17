@@ -88,9 +88,34 @@ playpixelpro/
 ├── assets/                 # JS & CSS assets
 ├── inc/
 │   └── customizer.php      # Customizer options panel & dynamic CSS engine
+├── plugins/
+│   └── playpixelpro-content/
+│       └── playpixelpro-content.php # Companion plugin providing CPTs & shortcodes
 └── page-templates/
     └── template-frontpage.php
 ```
+
+---
+
+## 🔌 Companion Plugin (PlayPixelPro Content)
+
+This repository includes the official **PlayPixelPro Content** companion plugin inside [`plugins/playpixelpro-content/`](file:///c:/wamp64/www/ClassicPress-release/wp-content/themes/playpixelpro/plugins/playpixelpro-content/playpixelpro-content.php).
+
+### Plugin Features:
+- **Custom Post Types**: Registers `downloads`, `services`, `projects`, `streams`, and `profiles`.
+- **Custom Taxonomy**: Registers `download_genre` for organizing downloads.
+- **Custom Shortcodes**:
+  - `[game-card id="123"]` - Terminal card view for digital downloads.
+  - `[terminal-box title="TITLE"]Content[/terminal-box]` - Retro terminal window wrapper.
+  - `[system-specs cpu="50" memory="40" disk="70"]` - System specs visual indicators.
+  - `[social-links]` - Dynamic social link badges.
+
+### Companion Plugin Installation:
+Copy or symlink `plugins/playpixelpro-content` to your site's `wp-content/plugins/` directory:
+```bash
+cp -r wp-content/themes/playpixelpro/plugins/playpixelpro-content wp-content/plugins/
+```
+Then activate **PlayPixelPro Content** under **Plugins** in your admin dashboard.
 
 ---
 
