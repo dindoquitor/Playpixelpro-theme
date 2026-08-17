@@ -117,7 +117,52 @@ function playpixelpro_assets() {
 add_action( 'wp_enqueue_scripts', 'playpixelpro_assets' );
 
 /**
- * Fallback Navigation Menu.
+ * Register Sidebars and Widget Areas.
+ */
+function playpixelpro_widgets_init() {
+	// 1. Blog Listing Sidebar
+	register_sidebar(
+		array(
+			'name'          => __( 'Blog Listing Sidebar', 'playpixelpro' ),
+			'id'            => 'sidebar-1',
+			'description'   => __( 'Add widgets here to appear in the sidebar of the main blog listing directory.', 'playpixelpro' ),
+			'before_widget' => '<fieldset id="%1$s" class="brutalist-card widget %2$s" style="padding: 16px; margin-bottom: 24px;">',
+			'after_widget'  => '</fieldset>',
+			'before_title'  => '<legend class="widget-title" style="padding: 0 8px; font-weight: 700; color: var(--gold); text-transform: uppercase; font-size: 0.88rem; font-family: var(--font-mono);">',
+			'after_title'   => '</legend>',
+		)
+	);
+
+	// 2. Single Post Sidebar
+	register_sidebar(
+		array(
+			'name'          => __( 'Single Post Sidebar', 'playpixelpro' ),
+			'id'            => 'sidebar-single',
+			'description'   => __( 'Add widgets here to appear in the sidebar of single blog post pages.', 'playpixelpro' ),
+			'before_widget' => '<fieldset id="%1$s" class="brutalist-fieldset widget %2$s" style="margin-bottom: 24px;">',
+			'after_widget'  => '</fieldset>',
+			'before_title'  => '<legend class="brutalist-legend widget-title">',
+			'after_title'   => '</legend>',
+		)
+	);
+
+	// 3. Footer Widgets
+	register_sidebar(
+		array(
+			'name'          => __( 'Footer Widgets', 'playpixelpro' ),
+			'id'            => 'footer-widgets',
+			'description'   => __( 'Add widgets here to appear in the theme footer.', 'playpixelpro' ),
+			'before_widget' => '<div id="%1$s" class="footer-widget %2$s" style="margin-bottom: 16px;">',
+			'after_widget'  => '</div>',
+			'before_title'  => '<h4 style="color: var(--gold); font-size: 0.9rem; margin-bottom: 8px;">',
+			'after_title'   => '</h4>',
+		)
+	);
+}
+add_action( 'widgets_init', 'playpixelpro_widgets_init' );
+
+/**
+ * Register Navigation Menus.
  */
 function playpixelpro_fallback_menu() {
 	echo '<ul class="nav-menu">';

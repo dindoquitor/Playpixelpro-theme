@@ -2124,3 +2124,101 @@ legend.contact-nano-legend {
 	0%, 100% { transform: scaleY(0.3); }
 	50% { transform: scaleY(1); }
 }
+
+/* ==========================================================================
+   ClassicPress Core Widget Terminal Styles (Appearance > Widgets)
+   ========================================================================== */
+
+.widget {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.85rem;
+	color: var(--text, #e9e2d4);
+	margin-bottom: 24px;
+}
+
+.widget ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.widget ul li {
+	padding: 6px 0;
+	border-bottom: 1px dashed var(--line, #4e4637);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 0.82rem;
+}
+
+.widget ul li:last-child {
+	border-bottom: none;
+}
+
+.widget ul li a {
+	color: var(--text, #e9e2d4);
+	text-decoration: none;
+	transition: color 0.15s ease;
+}
+
+.widget ul li a:hover {
+	color: var(--gold, #eec35e);
+}
+
+.widget select {
+	width: 100%;
+	background: var(--surface, #1e1b13);
+	color: var(--gold, #eec35e);
+	border: 1px solid var(--line, #4e4637);
+	padding: 8px;
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.82rem;
+	box-sizing: border-box;
+}
+
+.widget .tagcloud {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: 8px;
+}
+
+.widget .tagcloud a {
+	background: rgba(236, 234, 229, 0.05);
+	border: 1px solid var(--line, #4e4637);
+	color: var(--gold, #eec35e);
+	padding: 2px 8px;
+	font-size: 0.75rem !important;
+	text-decoration: none;
+	transition: all 0.15s ease;
+}
+
+.widget .tagcloud a:hover {
+	border-color: var(--gold, #eec35e);
+	background: rgba(238, 195, 94, 0.15);
+}
+
+#wp-calendar {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.8rem;
+}
+
+#wp-calendar caption {
+	font-weight: bold;
+	color: var(--gold, #eec35e);
+	margin-bottom: 6px;
+	text-transform: uppercase;
+}
+
+#wp-calendar th, #wp-calendar td {
+	text-align: center;
+	padding: 4px;
+	border: 1px solid var(--line, #4e4637);
+}
+
+#wp-calendar td#today {
+	background: var(--gold, #eec35e);
+	color: #16130b;
+	font-weight: bold;
+}

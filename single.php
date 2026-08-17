@@ -240,6 +240,13 @@ while ( have_posts() ) :
 				</div>
 			</fieldset>
 
+			<!-- ClassicPress Dynamic Single Post Widgets Area -->
+			<?php if ( is_active_sidebar( 'sidebar-single' ) ) : ?>
+				<div class="dynamic-single-widgets">
+					<?php dynamic_sidebar( 'sidebar-single' ); ?>
+				</div>
+			<?php endif; ?>
+
 			<?php
 			$show_related  = playpixelpro_is_option_enabled( 'playpixelpro_show_related_posts', true );
 			$related_title = get_theme_mod( 'playpixelpro_related_posts_title', 'grep -r related /' );

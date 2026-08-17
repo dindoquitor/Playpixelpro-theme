@@ -21,6 +21,13 @@ $mem_percent  = min( 100, round( ( memory_get_usage() / ( 128 * 1024 * 1024 ) ) 
 	<!-- 1. Search Box -->
 	<?php get_search_form(); ?>
 
+	<!-- ClassicPress Dynamic Blog Listing Widgets Area -->
+	<?php if ( is_active_sidebar( 'sidebar-1' ) ) : ?>
+		<div class="dynamic-widget-area">
+			<?php dynamic_sidebar( 'sidebar-1' ); ?>
+		</div>
+	<?php endif; ?>
+
 	<!-- 2. Categories Tree Structure -->
 	<fieldset class="brutalist-card" style="padding: 16px; margin-bottom: 24px;">
 		<legend style="padding: 0 8px; font-weight: 700; color: var(--gold); text-transform: uppercase; font-size: 0.88rem;">
