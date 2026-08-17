@@ -751,6 +751,202 @@ function playpixelpro_customize_register( $wp_customize ) {
 			'type'     => 'checkbox',
 		)
 	);
+
+	// ==========================================================================
+	// Section: About Me / Us Page Options
+	// ==========================================================================
+	$wp_customize->add_section(
+		'playpixelpro_about_section',
+		array(
+			'title'    => __( 'About Page Options', 'playpixelpro' ),
+			'panel'    => 'playpixelpro_panel',
+			'priority' => 45,
+		)
+	);
+
+	// Static About Page Assignment
+	$wp_customize->add_setting(
+		'playpixelpro_about_page',
+		array(
+			'default'           => 0,
+			'sanitize_callback' => 'absint',
+		)
+	);
+	$wp_customize->add_control(
+		new WP_Customize_Control(
+			$wp_customize,
+			'playpixelpro_about_page',
+			array(
+				'label'       => __( 'Select Static About Page', 'playpixelpro' ),
+				'description' => __( 'Choose a static page to display the Terminal About Me design layout.', 'playpixelpro' ),
+				'section'     => 'playpixelpro_about_section',
+				'type'        => 'dropdown-pages',
+			)
+		)
+	);
+
+	// --- 1. Terminal Hero Section ---
+	$wp_customize->add_setting( 'playpixelpro_about_show_hero', array( 'default' => true, 'sanitize_callback' => 'playpixelpro_sanitize_checkbox' ) );
+	$wp_customize->add_control( 'playpixelpro_about_show_hero', array( 'label' => __( 'Show Terminal Hero Section', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'checkbox' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_hero_session', array( 'default' => 'SESSION: bash — 80x24', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_hero_session', array( 'label' => __( 'Hero Session Header', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_hero_prompt', array( 'default' => 'user@dev-shell:~$', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_hero_prompt', array( 'label' => __( 'Hero CLI Prompt', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_hero_command', array( 'default' => 'cat bio.md', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_hero_command', array( 'label' => __( 'Hero CLI Command', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_hero_title', array( 'default' => '# ARCHITECTING DIGITAL INFRASTRUCTURE', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_hero_title', array( 'label' => __( 'Hero Title', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_hero_bio', array( 'default' => 'Senior developer specializing in high-performance cross-platform systems. Bridging the gap between low-level Android performance and modern reactive web architectures.', 'sanitize_callback' => 'sanitize_textarea_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_hero_bio', array( 'label' => __( 'Hero Bio / Overview', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'textarea' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_hero_col1_title', array( 'default' => 'ANDROID ECOSYSTEM', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_hero_col1_title', array( 'label' => __( 'Column 1 Title', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_hero_col1_items', array( 'default' => "Kotlin / Coroutines / Flow\nJetpack Compose UI Engine\nNative C++ (JNI) Integrations\nMaterial 3 Implementation", 'sanitize_callback' => 'sanitize_textarea_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_hero_col1_items', array( 'label' => __( 'Column 1 Items (One per line)', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'textarea' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_hero_col2_title', array( 'default' => 'WEB INFRASTRUCTURE', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_hero_col2_title', array( 'label' => __( 'Column 2 Title', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_hero_col2_items', array( 'default' => "React & Next.js Frameworks\nTypeScript / Strict Typing\nWebGL & Shader Programming\nTailwind & Headless UI", 'sanitize_callback' => 'sanitize_textarea_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_hero_col2_items', array( 'label' => __( 'Column 2 Items (One per line)', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'textarea' ) );
+
+	// --- 2. System Modules Section ---
+	$wp_customize->add_setting( 'playpixelpro_about_show_modules', array( 'default' => true, 'sanitize_callback' => 'playpixelpro_sanitize_checkbox' ) );
+	$wp_customize->add_control( 'playpixelpro_about_show_modules', array( 'label' => __( 'Show System Modules Grid', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'checkbox' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_modules_title', array( 'default' => 'SYSTEM_MODULES', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_modules_title', array( 'label' => __( 'Modules Section Title', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_modules_icon', array( 'default' => 'settings_input_component', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_modules_icon', array( 'label' => __( 'Modules Section Icon', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	// Module 1
+	$wp_customize->add_setting( 'playpixelpro_about_mod1_legend', array( 'default' => 'KERNEL_CORE', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod1_legend', array( 'label' => __( 'Module 1 Name (Legend)', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_mod1_row1_label', array( 'default' => 'OS_TARGET', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod1_row1_label', array( 'label' => __( 'Module 1 Row 1 Label', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+	$wp_customize->add_setting( 'playpixelpro_about_mod1_row1_val', array( 'default' => 'AOSP / LINUX', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod1_row1_val', array( 'label' => __( 'Module 1 Row 1 Value', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_mod1_row2_label', array( 'default' => 'PERF_METRIC', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod1_row2_label', array( 'label' => __( 'Module 1 Row 2 Label', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+	$wp_customize->add_setting( 'playpixelpro_about_mod1_row2_val', array( 'default' => 'OPTIMAL', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod1_row2_val', array( 'label' => __( 'Module 1 Row 2 Value', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_mod1_desc', array( 'default' => 'Android SDK, Gradle, NDK, Room DB, Retrofit, WorkManager, Dagger-Hilt.', 'sanitize_callback' => 'sanitize_textarea_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod1_desc', array( 'label' => __( 'Module 1 Description', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'textarea' ) );
+
+	// Module 2
+	$wp_customize->add_setting( 'playpixelpro_about_mod2_legend', array( 'default' => 'UI_SUBSYSTEM', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod2_legend', array( 'label' => __( 'Module 2 Name (Legend)', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_mod2_row1_label', array( 'default' => 'RENDERING', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod2_row1_label', array( 'label' => __( 'Module 2 Row 1 Label', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+	$wp_customize->add_setting( 'playpixelpro_about_mod2_row1_val', array( 'default' => 'GPU_ACCEL', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod2_row1_val', array( 'label' => __( 'Module 2 Row 1 Value', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_mod2_row2_label', array( 'default' => 'FPS_TARGET', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod2_row2_label', array( 'label' => __( 'Module 2 Row 2 Label', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+	$wp_customize->add_setting( 'playpixelpro_about_mod2_row2_val', array( 'default' => '120_LOCKED', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod2_row2_val', array( 'label' => __( 'Module 2 Row 2 Value', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_mod2_desc', array( 'default' => 'Compose, Framer Motion, Three.js, Canvas API, Figma-to-Code, Responsive Systems.', 'sanitize_callback' => 'sanitize_textarea_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod2_desc', array( 'label' => __( 'Module 2 Description', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'textarea' ) );
+
+	// Module 3
+	$wp_customize->add_setting( 'playpixelpro_about_mod3_legend', array( 'default' => 'NETWORK_BINARIES', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod3_legend', array( 'label' => __( 'Module 3 Name (Legend)', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_mod3_row1_label', array( 'default' => 'PROTOCOL', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod3_row1_label', array( 'label' => __( 'Module 3 Row 1 Label', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+	$wp_customize->add_setting( 'playpixelpro_about_mod3_row1_val', array( 'default' => 'GRPC / REST', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod3_row1_val', array( 'label' => __( 'Module 3 Row 1 Value', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_mod3_row2_label', array( 'default' => 'LATENCY', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod3_row2_label', array( 'label' => __( 'Module 3 Row 2 Label', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+	$wp_customize->add_setting( 'playpixelpro_about_mod3_row2_val', array( 'default' => '< 50MS', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod3_row2_val', array( 'label' => __( 'Module 3 Row 2 Value', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_mod3_desc', array( 'default' => 'Node.js, PostgreSQL, Redis, GraphQL, Docker, Vercel, Firebase, AWS S3.', 'sanitize_callback' => 'sanitize_textarea_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_mod3_desc', array( 'label' => __( 'Module 3 Description', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'textarea' ) );
+
+	// --- 3. Runtime History Section ---
+	$wp_customize->add_setting( 'playpixelpro_about_show_history', array( 'default' => true, 'sanitize_callback' => 'playpixelpro_sanitize_checkbox' ) );
+	$wp_customize->add_control( 'playpixelpro_about_show_history', array( 'label' => __( 'Show Runtime History Timeline', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'checkbox' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_history_title', array( 'default' => 'RUNTIME_HISTORY', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_history_title', array( 'label' => __( 'Timeline Section Title', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_history_icon', array( 'default' => 'terminal', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_history_icon', array( 'label' => __( 'Timeline Section Icon', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_history_filter', array( 'default' => 'FILTER: ERROR=0 INFO=ALL', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_history_filter', array( 'label' => __( 'Timeline Filter Subtext', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	// Log Entry 1
+	$wp_customize->add_setting( 'playpixelpro_about_log1_date', array( 'default' => '[2022-PRESENT] INFO:', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_log1_date', array( 'label' => __( 'Log 1 Date / Status Tag', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_log1_title', array( 'default' => 'LEAD MOBILE ENGINEER @ NEXUS_LABS', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_log1_title', array( 'label' => __( 'Log 1 Title & Role', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_log1_desc', array( 'default' => 'Architected a micro-services based Android application serving 2M+ active users. Reduced startup latency by 45% using Baseline Profiles and R8 optimization.', 'sanitize_callback' => 'sanitize_textarea_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_log1_desc', array( 'label' => __( 'Log 1 Description', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'textarea' ) );
+
+	// Log Entry 2
+	$wp_customize->add_setting( 'playpixelpro_about_log2_date', array( 'default' => '[2020-2022] INFO:', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_log2_date', array( 'label' => __( 'Log 2 Date / Status Tag', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_log2_title', array( 'default' => 'FULL STACK DEVELOPER @ BYTE_STREAM_INT', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_log2_title', array( 'label' => __( 'Log 2 Title & Role', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_log2_desc', array( 'default' => 'Engineered a real-time analytics dashboard using Next.js and WebSocket. Integration of complex data visualization modules using WebGL for high-density packet tracking.', 'sanitize_callback' => 'sanitize_textarea_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_log2_desc', array( 'label' => __( 'Log 2 Description', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'textarea' ) );
+
+	// Log Entry 3
+	$wp_customize->add_setting( 'playpixelpro_about_log3_date', array( 'default' => '[2018-2020] INFO:', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_log3_date', array( 'label' => __( 'Log 3 Date / Status Tag', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_log3_title', array( 'default' => 'JUNIOR ANDROID DEVELOPER @ CORE_APPS', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_log3_title', array( 'label' => __( 'Log 3 Title & Role', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_log3_desc', array( 'default' => 'Maintained legacy Java codebase while leading the migration to Kotlin. Implemented first-party authentication modules and unit testing suite coverage reaching 85%.', 'sanitize_callback' => 'sanitize_textarea_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_log3_desc', array( 'label' => __( 'Log 3 Description', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'textarea' ) );
+
+	// --- 4. Call To Action Section ---
+	$wp_customize->add_setting( 'playpixelpro_about_show_cta', array( 'default' => true, 'sanitize_callback' => 'playpixelpro_sanitize_checkbox' ) );
+	$wp_customize->add_control( 'playpixelpro_about_show_cta', array( 'label' => __( 'Show Call to Action Section', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'checkbox' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_cta_title', array( 'default' => 'READY_FOR_DEPLOYMENT?', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_cta_title', array( 'label' => __( 'CTA Title', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_cta_desc', array( 'default' => 'Currently accepting inquiries for high-impact technical roles and specialized architectural consulting.', 'sanitize_callback' => 'sanitize_textarea_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_cta_desc', array( 'label' => __( 'CTA Subtitle / Description', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'textarea' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_cta_btn1_text', array( 'default' => 'INIT_CONTACT', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_cta_btn1_text', array( 'label' => __( 'Button 1 Text', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_cta_btn1_url', array( 'default' => '#', 'sanitize_callback' => 'esc_url_raw' ) );
+	$wp_customize->add_control( 'playpixelpro_about_cta_btn1_url', array( 'label' => __( 'Button 1 URL', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'url' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_cta_btn2_text', array( 'default' => 'VIEW_REPOSITORY', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_cta_btn2_text', array( 'label' => __( 'Button 2 Text', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_cta_btn2_url', array( 'default' => '#', 'sanitize_callback' => 'esc_url_raw' ) );
+	$wp_customize->add_control( 'playpixelpro_about_cta_btn2_url', array( 'label' => __( 'Button 2 URL', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'url' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_cta_image', array( 'default' => 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?q=80&w=1200&auto=format&fit=crop', 'sanitize_callback' => 'esc_url_raw' ) );
+	$wp_customize->add_control( 'playpixelpro_about_cta_image', array( 'label' => __( 'CTA Image URL', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'url' ) );
+
+	$wp_customize->add_setting( 'playpixelpro_about_cta_lens_id', array( 'default' => 'LENS_ID: 0x4F2A', 'sanitize_callback' => 'sanitize_text_field' ) );
+	$wp_customize->add_control( 'playpixelpro_about_cta_lens_id', array( 'label' => __( 'CTA Lens ID Badge', 'playpixelpro' ), 'section' => 'playpixelpro_about_section', 'type' => 'text' ) );
 }
 add_action( 'customize_register', 'playpixelpro_customize_register' );
 

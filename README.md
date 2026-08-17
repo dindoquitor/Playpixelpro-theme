@@ -92,6 +92,8 @@ playpixelpro/
 │   └── playpixelpro-content/
 │       └── playpixelpro-content.php # Companion plugin providing CPTs & shortcodes
 └── page-templates/
+    ├── content-about.php       # Dynamic About Me layout template
+    ├── template-about.php      # About Me / Us Page Template
     └── template-frontpage.php
 ```
 
