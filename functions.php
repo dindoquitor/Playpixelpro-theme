@@ -44,24 +44,6 @@ function playpixelpro_setup() {
 add_action( 'after_setup_theme', 'playpixelpro_setup' );
 
 /**
- * Register Widget Areas.
- */
-function playpixelpro_widgets_init() {
-	register_sidebar(
-		array(
-			'name'          => __( 'Footer Widgets', 'playpixelpro' ),
-			'id'            => 'footer-widgets',
-			'description'   => __( 'Widgets added here will appear in the footer.', 'playpixelpro' ),
-			'before_widget' => '<div id="%1$s" class="widget brutalist-card %2$s">',
-			'after_widget'  => '</div>',
-			'before_title'  => '<h3 class="widget-title">',
-			'after_title'   => '</h3>',
-		)
-	);
-}
-add_action( 'widgets_init', 'playpixelpro_widgets_init' );
-
-/**
  * Enqueue Scripts and Styles.
  */
 function playpixelpro_assets() {
