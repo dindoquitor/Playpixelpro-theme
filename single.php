@@ -240,56 +240,83 @@ while ( have_posts() ) :
 				</div>
 			</fieldset>
 
-			<!-- Grep Sidebar -->
-			<fieldset class="brutalist-fieldset">
-				<legend class="brutalist-legend">grep -r related /</legend>
-				<div class="brutalist-fieldset-body">
-					<?php
-					$related_query = new WP_Query(
-						array(
-							'category__in'   => $cat_ids,
-							'post__not_in'   => array( $post_id ),
-							'posts_per_page' => 3,
+			<?php
+			$show_related  = playpixelpro_is_option_enabled( 'playpixelpro_show_related_posts', true );
+			$related_title = get_theme_mod( 'playpixelpro_related_posts_title', 'grep -r related /' );
+			$related_count = max( 1, absint( get_theme_mod( 'playpixelpro_related_posts_count', 3 ) ) );
+			$related_words = max( 5, absint( get_theme_mod( 'playpixelpro_related_excerpt_words', 12 ) ) );
+			?>
+
+			<?php if ( $show_related ) : ?>
+				<!-- Related Articles Sidebar Widget -->
+				<fieldset class="brutalist-fieldset related-articles-widget">
+					<legend class="brutalist-legend"><?php echo esc_html( $related_title ); ?></legend>
+					<div class="brutalist-fieldset-body" style="display: flex; flex-direction: column; gap: 16px;">
+						<?php
+						$related_args = array(
+							'post_type'      => 'post',
 							'post_status'    => 'publish',
-						)
-					);
-
-					if ( ! $related_query->have_posts() ) {
-						$related_query = new WP_Query(
-							array(
-								'post__not_in'   => array( $post_id ),
-								'posts_per_page' => 3,
-								'post_status'    => 'publish',
-							)
+							'posts_per_page' => $related_count,
+							'post__not_in'   => array( $post_id ),
 						);
-					}
 
-					if ( $related_query->have_posts() ) :
-						while ( $related_query->have_posts() ) :
-							$related_query->the_post();
-							$rel_slug = sanitize_title( get_the_title() );
-							$excerpt  = get_the_excerpt();
-							if ( empty( $excerpt ) ) {
-								$excerpt = get_the_title();
-							}
+						if ( ! empty( $cat_ids ) ) {
+							$related_args['category__in'] = $cat_ids;
+						}
+
+						$related_query = new WP_Query( $related_args );
+
+						if ( ! $related_query->have_posts() ) {
+							unset( $related_args['category__in'] );
+							$related_query = new WP_Query( $related_args );
+						}
+
+						if ( $related_query->have_posts() ) :
+							while ( $related_query->have_posts() ) :
+								$related_query->the_post();
+								$rel_excerpt = get_the_excerpt();
+								if ( empty( $rel_excerpt ) ) {
+									$rel_excerpt = get_the_title();
+								}
+								$summary_text = wp_trim_words( $rel_excerpt, $related_words, '...' );
+								?>
+								<article class="related-post-card">
+									<?php if ( has_post_thumbnail() ) : ?>
+										<div class="related-thumb-wrap">
+											<a href="<?php the_permalink(); ?>">
+												<?php the_post_thumbnail( 'medium', array( 'class' => 'related-post-img', 'alt' => get_the_title() ) ); ?>
+											</a>
+										</div>
+									<?php endif; ?>
+
+									<div class="related-post-content">
+										<h4 class="related-post-title">
+											<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+										</h4>
+
+										<p class="related-post-summary">
+											<?php echo esc_html( $summary_text ); ?>
+										</p>
+
+										<div class="related-post-action">
+											<a href="<?php the_permalink(); ?>" class="button related-post-btn">READ &gt;</a>
+										</div>
+									</div>
+								</article>
+								<?php
+							endwhile;
+							wp_reset_postdata();
+						else :
 							?>
-							<a class="grep-item" href="<?php the_permalink(); ?>">
-								<div class="grep-path">./blog/<?php echo esc_html( $rel_slug ); ?>.md</div>
-								<div class="grep-match">MATCH: &quot;<?php echo esc_html( playpixelpro_truncate( $excerpt, 4 ) ); ?>&quot;</div>
-							</a>
-							<?php
-						endwhile;
-						wp_reset_postdata();
-					else :
-						?>
-						<div style="color: var(--muted); font-size: 0.8rem; font-style: italic;">No related entries found.</div>
-					<?php endif; ?>
+							<div style="color: var(--muted); font-size: 0.8rem; font-style: italic;">No related entries found.</div>
+						<?php endif; ?>
 
-					<div style="padding-top: 10px; margin-top: 10px; border-top: 1px solid var(--line); font-size: 0.78rem; color: var(--muted); font-style: italic;">
-						Showing <?php echo esc_html( min( 3, $related_query->post_count ) ); ?> matches...
+						<div style="padding-top: 10px; border-top: 1px solid var(--line); font-size: 0.78rem; color: var(--muted); font-style: italic;">
+							Showing <?php echo esc_html( min( $related_count, $related_query->post_count ) ); ?> matches...
+						</div>
 					</div>
-				</div>
-			</fieldset>
+				</fieldset>
+			<?php endif; ?>
 
 			<!-- Dynamic Article Metrics Display -->
 			<div class="brutalist-card" style="padding: 16px; margin-bottom: 24px;">

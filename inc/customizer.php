@@ -1031,6 +1031,86 @@ function playpixelpro_customize_register( $wp_customize ) {
 			)
 		)
 	);
+
+	// Toggle Single Post Related Articles Widget
+	$wp_customize->add_setting(
+		'playpixelpro_show_related_posts',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'playpixelpro_sanitize_checkbox',
+		)
+	);
+	$wp_customize->add_control(
+		'playpixelpro_show_related_posts',
+		array(
+			'label'    => __( 'Show Related Articles in Single Post Sidebar', 'playpixelpro' ),
+			'section'  => 'playpixelpro_sidebar_section',
+			'type'     => 'checkbox',
+		)
+	);
+
+	// Related Posts Widget Legend Title
+	$wp_customize->add_setting(
+		'playpixelpro_related_posts_title',
+		array(
+			'default'           => 'grep -r related /',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+	$wp_customize->add_control(
+		'playpixelpro_related_posts_title',
+		array(
+			'label'    => __( 'Related Articles Widget Title', 'playpixelpro' ),
+			'section'  => 'playpixelpro_sidebar_section',
+			'type'     => 'text',
+		)
+	);
+
+	// Related Posts Count (Max Articles)
+	$wp_customize->add_setting(
+		'playpixelpro_related_posts_count',
+		array(
+			'default'           => 3,
+			'sanitize_callback' => 'absint',
+		)
+	);
+	$wp_customize->add_control(
+		'playpixelpro_related_posts_count',
+		array(
+			'label'       => __( 'Number of Related Articles to Display', 'playpixelpro' ),
+			'description' => __( 'Set how many related articles appear in the single post sidebar (1 to 10).', 'playpixelpro' ),
+			'section'     => 'playpixelpro_sidebar_section',
+			'type'        => 'number',
+			'input_attrs' => array(
+				'min'  => 1,
+				'max'  => 10,
+				'step' => 1,
+			),
+		)
+	);
+
+	// Related Excerpt Word Count
+	$wp_customize->add_setting(
+		'playpixelpro_related_excerpt_words',
+		array(
+			'default'           => 12,
+			'sanitize_callback' => 'absint',
+		)
+	);
+	$wp_customize->add_control(
+		'playpixelpro_related_excerpt_words',
+		array(
+			'label'       => __( 'Related Article Excerpt Length (Words)', 'playpixelpro' ),
+			'description' => __( 'Set word length of the related article summary (5 to 50 words).', 'playpixelpro' ),
+			'section'     => 'playpixelpro_sidebar_section',
+			'type'        => 'number',
+			'input_attrs' => array(
+				'min'  => 5,
+				'max'  => 50,
+				'step' => 1,
+			),
+		)
+	);
 }
 add_action( 'customize_register', 'playpixelpro_customize_register' );
 
